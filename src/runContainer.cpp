@@ -32,7 +32,7 @@
 
 #include "IsolatedContainer.h"
 
-#define CHILDCONTAINERNAME "/home/jdellaria/eclipse-workspace/addFileDuplicate/Release/addFileDuplicate"
+#define CHILDCONTAINERNAME "/home/jdellaria/eclipse-workspace/addFileDuplicate/Default/addFileDuplicate"
 
 
 #include "configurationFile.h"
