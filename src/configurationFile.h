@@ -23,14 +23,12 @@ public:
 	void help(char *);
 	int getConfiguration(char *);
 
-	std::string airportAddress;
 	std::string logFileName;
 	std::string logValue;
 	bool logPrintScreen;
 	bool logPrintFile;
 	bool logPrintTime;
-	bool playContinuous;
-	std::string ALSAVolumeControlName;
+
 };
 
 #endif /* CONFIGURATIONFILE_H_ */

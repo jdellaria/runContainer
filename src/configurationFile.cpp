@@ -27,13 +27,10 @@ using namespace std;
 
 configurationFile::configurationFile()
 {
-	airportAddress.clear();
-	airportAddress.append("192.168.19.101");
 	logFileName.clear();
 	logPrintScreen = true;
 	logPrintFile = true;
 	logPrintTime = true;
-	playContinuous = false;
 }
 
 configurationFile::~configurationFile()
@@ -58,11 +55,7 @@ int configurationFile::getConfiguration(char *Name)
 	const char* exampleXMLFile =
 		"Config file should look like this:\n"
 		"<?xml version=\"1.0\"  standalone='no' >\n"
-		"<!-- Configuration Parmeters -->\n"
-		"<airportAddress>\n"
-		"192.168.19.101\n"
-		"</airportAddress>";
-//	string message;
+		"<!-- Configuration Parmeters -->\n";
 
 	if ( !loadOkay )
 	{
@@ -80,23 +73,6 @@ int configurationFile::getConfiguration(char *Name)
 
 	// Get the "ToDo" element.
 	// It is a child of the document, and can be selected by name.
-	node = doc.FirstChild( "airportAddress" );
-	if (!node)
-	{
-		fprintf( stdout,"airportAddress child not found!! XML file is invalid\n.%s",exampleXMLFile);
-	}
-//	assert( node );
-	airportAddressElement = node->ToElement();
-	if (!airportAddressElement)
-	{
-		fprintf( stdout,"airportAddress element not found!! XML file is invalid\n.%s",exampleXMLFile);
-	}
-//	fprintf( stdout, "airportAddress element Value:%s\n", airportAddressElement->Value() );
-//	fprintf( stdout, "airportAddress element GetText:%s\n", airportAddressElement->GetText() );
-	airportAddress.clear();
-	airportAddress.append(airportAddressElement->GetText());
-
-
 
 	node = doc.FirstChild( "logfilename" );
 	if (!node)
@@ -248,67 +224,7 @@ int configurationFile::getConfiguration(char *Name)
 		message =  "logPrintTime = true";
 		myLog.print(logInformation, message);
 	}
-// -----
-	node = doc.FirstChild( "playContinuous" );
-	if (!node)
-	{
-		message = "playContinuous child not found!! XML file is invalid\n.";
-		message.append(exampleXMLFile);
-		myLog.print(logError, message);
-		exit(0);
-	}
-	portElement = node->ToElement();
-	if (!portElement)
-	{
-		message = "playContinuous element not found!! XML file is invalid\n.";
-		message.append(exampleXMLFile);
-		myLog.print(logError, message);
-		exit(0);
-	}
-	message = "playContinuous element GetText:";
-	message.append(portElement->GetText());
-	myLog.print(logInformation, message);
-	myString = portElement->GetText();
-	if (myString.find("false")!=string::npos)
-	{
-		playContinuous = false;
 
-		message = "playContinuous = false";
-		myLog.print(logInformation, message);
-	}
-	if (myString.find("true")!=string::npos)
-	{
-		playContinuous = true;
-
-		message =  "playContinuous = true";
-		myLog.print(logInformation, message);
-	}
-
-	node = doc.FirstChild( "ALSAVolumeControlName" );
-	if (!node)
-	{
-		message = "ALSAVolumeControlName child not found!! XML file is invalid\n.";
-		message.append(exampleXMLFile);
-		myLog.print(logError, message);
-		exit(0);
-	}
-	portElement = node->ToElement();
-	if (!portElement)
-	{
-//		sprintf( message,"ALSAVolumeControlName element not found!! XML file is invalid\n.%s",exampleXMLFile);
-		message = "ALSAVolumeControlName element not found!! XML file is invalid\n.";
-		message.append(exampleXMLFile);
-		myLog.print(logError, message);
-		exit(0);
-	}
-//	sprintf( message, "ALSAVolumeControlName element GetText:%s", portElement->GetText() );
-
-	message = "ALSAVolumeControlName element GetText:";
-	message.append(portElement->GetText());
-
-	myLog.print(logInformation, message);
-	ALSAVolumeControlName.clear();
-	ALSAVolumeControlName.append(portElement->GetText());
 
 
 }

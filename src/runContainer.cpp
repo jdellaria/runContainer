@@ -52,8 +52,8 @@ DLog myLog;
 
 configurationFile myConfig;
 ApplicationModes myAppModes;
-//#define NUMBEROFCONTAINERS 20
-IsolatedContainer *myContainerPtr; //= new IsolatedContainer[NUMBEROFCONTAINERS];
+
+IsolatedContainer *myContainerPtr;
 int currentlyActiveContainer = 0;
 long numberOfContainers = 0;
 
@@ -85,12 +85,8 @@ char* getCmdOption(char ** begin, char ** end, const std::string & option)
 
 int main(int argc, char* argv[])
 {
-	int returnValue;
 	string message;
-	char ibuffer [33];
-	const char *myFileName;
-
-//	char jon[returnValue];
+	char intbuffer[50];
 
 	myConfig.getConfiguration("config.xml");
 	Directory myDirectory;
@@ -99,63 +95,57 @@ int main(int argc, char* argv[])
 
 	configApp();
 	// Set the action defaults
-/*	if(cmdOptionExists(argv, argv+argc, "-containers")||cmdOptionExists(argv, argv+argc, "-c"))
-	{
 
-	}
-*/
     char * STRnumberOfContainers = getCmdOption(argv, argv + argc, "-c");
 
     if (STRnumberOfContainers)
     {
     	char *pNext;
     	numberOfContainers = strtol (STRnumberOfContainers, &pNext, 10);
-        // Do interesting things
-        // ...
+
     }
     else
     {
     	numberOfContainers = 1;
     }
-	std::cout << "Number of Containers " << numberOfContainers << "\n" ;
-	IsolatedContainer *myDummyPtr = new IsolatedContainer[numberOfContainers];
-	myContainerPtr = myDummyPtr;
-	myAppModes.setPlayMode (PLAY_ACTION_PLAY);
-//	myAppModes.setContinuous();
-//	myAppModes.setManual();
-//	myAppModes.setNetworkMode(NETWORK_ACTION_DISCONNECT);
-	message = "airportAddress is: ";
-	message.append(myConfig.airportAddress + "\n");
+	message.clear();
+	message.append("Number of Containers ");
+
+	sprintf(intbuffer,"%d",numberOfContainers);
+	message.append(intbuffer);
 	myLog.print(logWarning, message);
 
-    if( argc > 1 )
-    {
-        std::cout << "there are " << argc-1 << " (more) arguments, they are:\n" ;
+	IsolatedContainer *myDummyPtr = new IsolatedContainer[numberOfContainers];
+	myContainerPtr = myDummyPtr;
 
- //       std::cout( argv+1, argv+argc, std::ostream_iterator<const char*>( std::cout, "\n" ) ) ;
-        myFileName = argv[argc-1];
-        std::cout << "myFileName: " << myFileName << "\n";
-    }
+
 	Start_t = time(NULL);    //record time that task 1 begins
 	myDirectory.Recurse("/home/jdellaria/Desktop/doFiles", doRecurseDirectory);
-	std::cout << "Waiting for children to close " << "\n";
+	message.clear();
+	message.append("Waiting for children to close");
+	myLog.print(logWarning, message);
+
 	waitForAllChildContainersToClose();
-	std::cout << "Deleting empty directories " << "\n";
+	message.clear();
+	message.append("Deleting empty directories");
+	myLog.print(logWarning, message);
+
 	myDirectory.Recurse("/home/jdellaria/Desktop/doFiles", doRemoveEmptyDirectories);
 	End_t = time(NULL);    //record time that task 1 ends
 	time_task1 = difftime(End_t, Start_t);    //compute elapsed time of task 1
 
 	message.clear();
 	message.append("Task took ");
-	char intbuffer[50];
+
 	sprintf(intbuffer,"%d",time_task1);
 	message.append(intbuffer);
 	message.append(" seconds.");
-	myLog.print(logWarning, message);
+
+	myLog.print(logInformation, message);
 	message = "runContainer.cpp :";
 	message.append(__func__);
 	message.append(": runContainer exiting Normally");
-	myLog.print(logWarning, message);
+	myLog.print(logInformation, message);
 }
 
 #define MAIN_EVENT_TIMEOUT 3 // sec unit
@@ -221,15 +211,15 @@ int removeEmptyDirectory(const char* directory)
 
 	fixDirectoryCount = 0;
 	directoryCount = myDirectoryCount.Get(directory);
-//	cout << "directory Count:"  << directoryCount << ".\n";
+
 	if (directoryCount == 0)
 	{
 		myDirectory.Remove(directory);
 		message.clear();
 		message.append("removeEmptyDirectory: directory removed:");
 		message.append(directory);
-		myLog.print(logWarning, message);
-//		cout << "directory removed:"  << directory << ".\n";
+		myLog.print(logDebug, message);
+
 	}
 	else
 	{
@@ -245,18 +235,16 @@ void doRecurseDirectory(char const * text, int x)
 	{
 		message.clear();
 		message.append(text);
-		myLog.print(logWarning, message);
+		myLog.print(logDebug, message);
 		callChildContainer(message);
 	}
 }
 
 int callChildContainer(string originalFileName)
 {
-	char originalFileHash[36];
-	char destinationFileHash[34];
 	string destinationFileName;
 	string destinationVersionFileName;
-	int returnValue;
+//	int returnValue;
 	string message;
 
 	char const *darg[7]={CHILDCONTAINERNAME, "-d",  NULL,  NULL, NULL}; // -d tells child to delete file if duplicate
@@ -264,7 +252,16 @@ int callChildContainer(string originalFileName)
 
 	do
 	{
-		std::cout << "----working on file " << originalFileName << " programID:" << myContainerPtr[currentlyActiveContainer].programID << "\n" ;
+//		std::cout << "----working on file " << originalFileName << " programID:" << myContainerPtr[currentlyActiveContainer].programID << "\n" ;
+		message.clear();
+		message.append("Working on file ");
+		message.append(originalFileName);
+		message.append(" programID:");
+
+		char intbuffer[50];
+		sprintf(intbuffer,"%d",myContainerPtr[currentlyActiveContainer].programID);
+		message.append(intbuffer);
+		myLog.print(logDebug, message);
 		if ( myContainerPtr[currentlyActiveContainer].programID == 0)
 		{
 			myContainerPtr[currentlyActiveContainer].OpenChild(darg);
@@ -323,7 +320,7 @@ int waitForAllChildContainersToClose()
 				if ( myContainerPtr[x].hasChildCompleted() > 0)
 				{
 					myContainerPtr[x].CloseChild();
-					std::cout << "----waitForAllChildContainersToClose x=" << x << " has closed \n" ;
+//					std::cout << "----waitForAllChildContainersToClose x=" << x << " has closed \n" ;
 				}
 			}
 			else
@@ -333,7 +330,7 @@ int waitForAllChildContainersToClose()
 
 		}
 	}while (allClosed != numberOfContainers);
-	std::cout << "----exiting waitForAllChildContainersToClose " << " \n" ;
+//	std::cout << "----exiting waitForAllChildContainersToClose " << " \n" ;
 	return 0;
 }
 
@@ -370,18 +367,7 @@ int configApp()
 		message = "myLog.logValue = logError";
 		myLog.print(logInformation, message);
 	}
-	if (myConfig.playContinuous == true)
-	{
-		myAppModes.setContinuous();
-		message = "Continuous Play Mode";
-		myLog.print(logInformation, message);
-	}
-	else
-	{
-		myAppModes.setManual();
-		message = "Manual Play Mode";
-		myLog.print(logInformation, message);
-	}
+
 	return (1);
 }
 

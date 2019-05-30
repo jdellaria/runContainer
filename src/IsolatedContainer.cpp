@@ -71,7 +71,7 @@ void IsolatedContainer::CloseChild()
 	char returnBuffer[1000];
 	do
 	{
-		std::cout << "Waiting for child to complete"<< "\n";
+//		std::cout << "Waiting for child to complete"<< "\n";
 		i = read(infds[0], returnBuffer, RETURNBUFFERLENGTH-1); // get 1st 1023 bytes of the string returned from program that was executed
 		returnBuffer[i] = '\0';         /* string terminator     */
 		incomingMessage.append(returnBuffer);
